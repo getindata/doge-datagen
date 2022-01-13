@@ -54,16 +54,15 @@ def value_function(timestamp: int, subject: Subject, transition: Transition):
 
 if __name__ == '__main__':
     factory = KafkaSinkFactory(['localhost:9092'], 'doge-kafka-example')
-    event_callback = factory.create('test_topic', key_function, value_function)
+    sink = factory.create('test_topic', key_function, value_function)
 
-    datagen = DataOnlineGenerator(['offline', 'online', 'loan_screen'], 'offline', UserFactory(), 1, 60000, 1000)
-    datagen.add_transition('income', 'offline', 'offline', 0.01, action_callback=income_callback, event_callback=event_callback)
-    datagen.add_transition('spending', 'offline', 'offline', 0.1, action_callback=spending_callback, event_callback=event_callback)
-    datagen.add_transition('login', 'offline', 'online', 0.1, event_callback=event_callback)
-    datagen.add_transition('logout', 'online', 'offline', 70, event_callback=event_callback)
-    datagen.add_transition('go_loan_screen', 'online', 'loan_screen', 30, event_callback=event_callback)
-    datagen.add_transition('close_loan_screen', 'loan_screen', 'online', 40, event_callback=event_callback)
-    datagen.add_transition('take_loan', 'loan_screen', 'online', 10, action_callback=take_loan_callback, event_callback=event_callback)
+    datagen = DataOnlineGenerator(['offline', 'online', 'loan_screen'], 'offline', UserFactory(), 1, 60000, 10000)
+    datagen.add_transition('income', 'offline', 'offline', 0.01, action_callback=income_callback, event_sink=sink)
+    datagen.add_transition('spending', 'offline', 'offline', 0.1, action_callback=spending_callback, event_sink=sink)
+    datagen.add_transition('login', 'offline', 'online', 0.1, event_sink=sink)
+    datagen.add_transition('logout', 'online', 'offline', 70, event_sink=sink)
+    datagen.add_transition('go_loan_screen', 'online', 'loan_screen', 30, event_sink=sink)
+    datagen.add_transition('close_loan_screen', 'loan_screen', 'online', 40, event_sink=sink)
+    datagen.add_transition('take_loan', 'loan_screen', 'online', 10, action_callback=take_loan_callback, event_sink=sink)
 
     datagen.start()
-    factory.flush()
