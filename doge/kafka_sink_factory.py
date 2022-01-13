@@ -1,6 +1,7 @@
+from typing import Iterable, Callable, TypeVar
+
 from confluent_kafka import SerializingProducer
 from confluent_kafka.serialization import SerializationContext, StringSerializer
-from typing import Iterable, Callable, TypeVar
 
 from doge import Subject, Transition
 
@@ -8,7 +9,7 @@ K = TypeVar('K')
 V = TypeVar('V')
 
 
-class KafkaCallbackFactory(object):
+class KafkaSinkFactory(object):
     def __init__(self,
                  bootstrap_servers: Iterable[str],
                  client_id: str,
@@ -26,3 +27,6 @@ class KafkaCallbackFactory(object):
         def callback(timestamp: int, subject: Subject, transition: Transition):
             self.producer.produce(topic, key=key_function(subject, transition), value=value_function(timestamp, subject, transition), timestamp=timestamp)
         return callback
+
+    def flush(self):
+        self.producer.flush()

@@ -1,5 +1,5 @@
 from random import randrange
-from doge import *
+from doge.doge import *
 
 
 def printing_event_callback(timestamp: int, user: Subject, transition: Transition):
