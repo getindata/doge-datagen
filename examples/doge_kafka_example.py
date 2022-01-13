@@ -1,7 +1,7 @@
-from random import randrange
-from doge import *
-from kafka_callback_factory import KafkaCallbackFactory
 import json
+from random import randrange
+
+from doge import Subject, Transition, SubjectFactory, DataOnlineGenerator, KafkaSinkFactory
 
 
 def income_callback(subject: Subject, transition: Transition):
@@ -53,7 +53,7 @@ def value_function(timestamp: int, subject: Subject, transition: Transition):
 
 
 if __name__ == '__main__':
-    factory = KafkaCallbackFactory(['localhost:9092'], 'doge-kafka-example')
+    factory = KafkaSinkFactory(['localhost:9092'], 'doge-kafka-example')
     event_callback = factory.create('test_topic', key_function, value_function)
 
     datagen = DataOnlineGenerator(['offline', 'online', 'loan_screen'], 'offline', UserFactory(), 1, 60000, 1000)
@@ -66,4 +66,4 @@ if __name__ == '__main__':
     datagen.add_transition('take_loan', 'loan_screen', 'online', 10, action_callback=take_loan_callback, event_callback=event_callback)
 
     datagen.start()
-    factory.producer.flush()
+    factory.flush()
