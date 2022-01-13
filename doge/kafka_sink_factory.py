@@ -3,10 +3,25 @@ from typing import Iterable, Callable, TypeVar
 from confluent_kafka import SerializingProducer
 from confluent_kafka.serialization import SerializationContext, StringSerializer
 
-from doge import Subject, Transition
+from doge import Subject, Transition, EventSink
 
 K = TypeVar('K')
 V = TypeVar('V')
+
+
+class KafkaSink(EventSink):
+
+    def __init__(self, producer: SerializingProducer, topic: str, key_function: Callable[[Subject, Transition], K], value_function: Callable[[int, Subject, Transition], V]):
+        self.producer = producer
+        self.topic = topic
+        self.key_function = key_function
+        self.value_function = value_function
+
+    def collect(self, timestamp: int, subject: Subject, transition: 'Transition'):
+        self.producer.produce(self.topic, key=self.key_function(subject, transition), value=self.value_function(timestamp, subject, transition), timestamp=timestamp)
+
+    def close(self):
+        self.producer.flush()
 
 
 class KafkaSinkFactory(object):
@@ -24,9 +39,4 @@ class KafkaSinkFactory(object):
         self.producer = SerializingProducer(conf)
 
     def create(self, topic: str, key_function: Callable[[Subject, Transition], K], value_function: Callable[[int, Subject, Transition], V]):
-        def callback(timestamp: int, subject: Subject, transition: Transition):
-            self.producer.produce(topic, key=key_function(subject, transition), value=value_function(timestamp, subject, transition), timestamp=timestamp)
-        return callback
-
-    def flush(self):
-        self.producer.flush()
+        return KafkaSink(self.producer, topic, key_function, value_function)

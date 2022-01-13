@@ -1,5 +1,6 @@
+from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import List, Dict, Callable, Iterable
+from typing import List, Dict, Callable, Iterable, Set
 from random import choices
 
 
@@ -15,15 +16,24 @@ class SubjectFactory(object):
         return Subject()
 
 
+class EventSink(ABC):
+    @abstractmethod
+    def collect(self, timestamp: int, subject: Subject, transition: 'Transition'):
+        pass
+
+    def close(self):
+        pass
+
+
 class Transition(object):
 
-    def __init__(self, trigger: str, from_state: str, to_state: str, probability: float, action_callback: Callable[[Subject, 'Transition'], None] = None, event_callback: Callable[[int, Subject, 'Transition'], None] = None):
+    def __init__(self, trigger: str, from_state: str, to_state: str, probability: float, action_callback: Callable[[Subject, 'Transition'], None] = None, event_sink: EventSink = None):
         self.trigger = trigger
         self.from_state = from_state
         self.to_state = to_state
         self.probability = probability
         self.action_callback = action_callback
-        self.event_callback = event_callback
+        self.event_sink = event_sink
 
 
 class DataOnlineGenerator(object):
@@ -31,6 +41,7 @@ class DataOnlineGenerator(object):
     transition_matrix: Dict[str, Dict[str, Transition]]
     probability_matrix: Dict[str, Dict[str, float]]
     subject_states: Dict[Subject, str]
+    sinks: Set[EventSink]
 
     def __init__(self, states: List[str], initial_state: str, subject_factory: SubjectFactory, subjects_num: int, tick_ms: int, ticks_num: int, timestamp_start: int =0):
         self.states = states
@@ -43,12 +54,16 @@ class DataOnlineGenerator(object):
         self.transition_matrix = {}
         self.probability_matrix = {}
         self.subjects_states = {}
+        self.sinks = set()
 
-    def add_transition(self, trigger: str, from_state: str, to_state: str, probability: float, action_callback: Callable[[Subject, 'Transition'], None] = None, event_callback: Callable[[int, Subject, 'Transition'], None] = None):
+    def add_transition(self, trigger: str, from_state: str, to_state: str, probability: float, action_callback: Callable[[Subject, 'Transition'], None] = None, event_sink: EventSink = None):
         if from_state not in self.states or to_state not in self.states:
             raise ValueError('State is not present in machine states')
 
-        transition = Transition(trigger, from_state, to_state, probability, action_callback, event_callback)
+        if event_sink:
+            self.sinks.add(event_sink)
+
+        transition = Transition(trigger, from_state, to_state, probability, action_callback, event_sink)
 
         if from_state in self.transition_matrix:
             self.transition_matrix[from_state][trigger] = transition
@@ -88,10 +103,14 @@ class DataOnlineGenerator(object):
                 self.subjects_states[subject] = transition.to_state
                 if transition.action_callback:
                     transition.action_callback(subject, transition)
-                if transition.event_callback:
-                    transition.event_callback(self.timestamp, subject, transition)
+                if transition.event_sink:
+                    transition.event_sink.collect(self.timestamp, subject, transition)
 
         self.timestamp += self.tick_ms
+
+    def __close_sinks(self):
+        for sink in self.sinks:
+            sink.close()
 
     def start(self):
         print("Data generation start:", datetime.now())
@@ -99,4 +118,7 @@ class DataOnlineGenerator(object):
         self.__add_stay_transitions()
         for i in range(self.ticks_num):
             self.__tick()
+        self.__close_sinks()
         print("Data generation finished:", datetime.now())
+
+
