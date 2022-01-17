@@ -1,0 +1,19 @@
+{
+  "namespace": "com.getindata.doge",
+  "type": "record",
+  "name": "Event",
+  "fields": [
+    { "name":  "user", "type":  {
+      "namespace": "com.getindata.doge",
+      "type": "record",
+      "name": "User",
+      "fields": [
+        { "name":  "userId", "type":  "string"},
+        { "name":  "balance", "type":  "string"},
+        { "name":  "loanBalance", "type":  "string"}
+      ]
+    }},
+    { "name":  "timestamp", "type":  "int"},
+    { "name":  "event", "type":  "string"}
+  ]
+}

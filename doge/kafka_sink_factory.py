@@ -1,7 +1,7 @@
 from typing import Iterable, Callable, TypeVar
 
-from confluent_kafka import SerializingProducer
-from confluent_kafka.serialization import SerializationContext, StringSerializer
+from confluent_kafka import Producer
+from confluent_kafka.serialization import SerializationContext, StringSerializer, Serializer, MessageField
 
 from doge import Subject, Transition, EventSink
 
@@ -10,21 +10,28 @@ V = TypeVar('V')
 
 
 class KafkaSink(EventSink):
-
     def __init__(self,
-                 producer: SerializingProducer,
+                 producer: Producer,
                  topic: str,
                  key_function: Callable[[Subject, Transition], K],
-                 value_function: Callable[[int, Subject, Transition], V]):
+                 key_serializer: Serializer,
+                 value_function: Callable[[int, Subject, Transition], V],
+                 value_serializer: Serializer):
         self.producer = producer
         self.topic = topic
         self.key_function = key_function
+        self.key_serializer = key_serializer
         self.value_function = value_function
+        self.value_serializer = value_serializer
 
     def collect(self, timestamp: int, subject: Subject, transition: 'Transition'):
+        key_ctx = SerializationContext(self.topic, MessageField.KEY)
+        key = self.key_serializer(self.key_function(subject, transition), key_ctx)
+        value_ctx = SerializationContext(self.topic, MessageField.VALUE)
+        value = self.value_serializer(self.value_function(timestamp, subject, transition), value_ctx)
         self.producer.produce(self.topic,
-                              key=self.key_function(subject, transition),
-                              value=self.value_function(timestamp, subject, transition),
+                              key=key,
+                              value=value,
                               timestamp=timestamp)
 
     def close(self):
@@ -34,30 +41,24 @@ class KafkaSink(EventSink):
 class KafkaSinkFactory(object):
     def __init__(self,
                  bootstrap_servers: Iterable[str],
-                 client_id: str,
-                 key_serializer: Callable[[K, SerializationContext], bytes] = StringSerializer(),
-                 value_serializer: Callable[[V, SerializationContext], bytes] = StringSerializer()):
+                 client_id: str):
         """
         :param bootstrap_servers: list of bootstrap servers
         :type bootstrap_servers: Iterable[str]
         :param client_id: sink client id
         :type client_id: str
-        :param key_serializer: serializer that will be used to serialize a key to bytes
-        :type key_serializer: Callable[[K, SerializationContext], bytes]
-        :param value_serializer: serializer that will be used to serialize a value to bytes
-        :type value_serializer: Callable[[V, SerializationContext], bytes]
         """
         conf = {
             'bootstrap.servers': ','.join(bootstrap_servers),
             'client.id': client_id,
-            'key.serializer': key_serializer,
-            'value.serializer': value_serializer
         }
-        self.producer = SerializingProducer(conf)
+        self.producer = Producer(conf)
 
     def create(self, topic: str,
                key_function: Callable[[Subject, Transition], K],
-               value_function: Callable[[int, Subject, Transition], V]) -> KafkaSink:
+               value_function: Callable[[int, Subject, Transition], V],
+               key_serializer=StringSerializer(),
+               value_serializer=StringSerializer()) -> KafkaSink:
         """
         :param topic: topic name to which events will be emitted
         :type topic: str
@@ -66,7 +67,11 @@ class KafkaSinkFactory(object):
         :param value_function: function that converts timestamp, subject and transition to a format consumable by
             value serializer
         :type value_function: Callable[[int, Subject, Transition], V]
+        :param key_serializer: Serializer instance that will be used to serialize key_function output into bytes
+        :type key_serializer: Serializer
+        :param value_serializer: Serializer instance that will be used to serialize value_function output into bytes
+        :type value_serializer: Serializer
         :return: KafkaSink instance
         :rtype: KafkaSink
         """
-        return KafkaSink(self.producer, topic, key_function, value_function)
+        return KafkaSink(self.producer, topic, key_function, key_serializer, value_function, value_serializer)
