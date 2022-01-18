@@ -8,6 +8,7 @@ confluent-kafka = "*"
 SQLAlchemy = "*"
 psycopg2-binary = "*"
 fastavro = "*"
+requests = "*"
 
 [dev-packages]
 pytest = "*"
