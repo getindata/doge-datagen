@@ -1,12 +1,47 @@
-# You can override the included template(s) by including variable overrides
-# SAST customization: https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
-# Secret Detection customization: https://docs.gitlab.com/ee/user/application_security/secret_detection/#customizing-settings
-# Dependency Scanning customization: https://docs.gitlab.com/ee/user/application_security/dependency_scanning/#customizing-the-dependency-scanning-settings
-# Note that environment variables can be set in several places
-# See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
+variables:
+  PIPENV_VENV_IN_PROJECT: "true"
+
 stages:
-- test
-sast:
+  - build
+  - test
+  - ship
+
+image: python:3.8
+
+whl:
+  stage: build
+  before_script:
+    - pip install pipenv
+    - pipenv lock -r > requirements.txt
+  script:
+    - python setup.py sdist bdist_wheel
+  artifacts:
+    paths:
+      - dist/*
+
+pytest:
   stage: test
-include:
-- template: Security/SAST.gitlab-ci.yml
+  before_script:
+    - pip install pipenv
+    - pipenv install --dev
+  script:
+    - pipenv run pytest
+  cache:
+    paths:
+      - .venv/*
+  except:
+    - tags
+
+pypi:
+  stage: ship
+  before_script:
+    - pip install pipenv twine
+    - pipenv lock -r > requirements.txt
+  script:
+    - python setup.py verify
+    - TWINE_USERNAME="gitlab-ci-token" TWINE_PASSWORD="${CI_JOB_TOKEN}"
+      python -m twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi dist/*
+  needs:
+    - whl
+  rules:
+    - if: "$CI_COMMIT_TAG"
