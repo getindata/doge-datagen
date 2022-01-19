@@ -1,14 +1,14 @@
 from typing import Dict, Any
 
-from doge import Subject, Transition, KafkaAvroSinkFactory
-from examples.doge_example_common import create_example_data_online_generator
+from doge import Transition, KafkaAvroSinkFactory
+from examples.doge_example_common import create_example_data_online_generator, User
 
 
-def key_function(subject: Subject, transition: Transition) -> Dict[str, Any]:
+def key_function(subject: User, transition: Transition) -> Dict[str, Any]:
     return {'key': str(subject.user_id)}
 
 
-def value_function(timestamp: int, subject: Subject, transition: Transition) -> Dict[str, Any]:
+def value_function(timestamp: int, subject: User, transition: Transition) -> Dict[str, Any]:
     value = {
         'timestamp': timestamp,
         'user': {

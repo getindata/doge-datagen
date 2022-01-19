@@ -9,4 +9,3 @@ class PrintingSink(EventSink):
 
     def collect(self, timestamp: int, subject: Subject, transition: 'Transition'):
         print(self.format_function(timestamp, subject, transition))
-

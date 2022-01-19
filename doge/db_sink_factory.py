@@ -16,7 +16,7 @@ class DbSink(EventSink):
                  batch_size: int):
         self.engine = engine
         self.table = Table(table_name, metadata)
-        self.batch = []
+        self.batch: List[Dict[str, Any]] = []
         self.row_mapper_function = row_mapper_function
         self.batch_size = batch_size
 
