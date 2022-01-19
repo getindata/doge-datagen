@@ -135,7 +135,8 @@ class DataOnlineGenerator(Generic[Subject]):
         :type from_state: str
         :param to_state: name of the state transition points to
         :type to_state: str
-        :param probability: probability of Subject choosing this transition when being in state :param from_state
+        :param probability: probability (in percentage, where 100 means certain probability) of Subject choosing this
+            transition when being in state :param from_state
         :type probability: float
         :param action_callback: optional function that accepts Subject and Transition and returns a boolean value.
             It allows subject state manipulation and its return value is used as a condition for transition. If False

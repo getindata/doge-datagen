@@ -1,0 +1,13 @@
+@startuml
+state Offline
+state Online
+state "Loan Screen" as LoanScreen
+
+Offline --> Offline : Income (P=0.01%)
+Offline --> Offline : Spending (P=0.1%)
+Offline --> Online : Login (P=0.1%)
+Online --> Offline : Logout (P=70%)
+Online --> LoanScreen : Open loan screen (P=30%)
+LoanScreen --> Online : Close loan screen (P=40%)
+LoanScreen --> Online : Take loan (P=10%)
+@enduml

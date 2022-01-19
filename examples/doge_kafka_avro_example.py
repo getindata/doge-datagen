@@ -29,7 +29,6 @@ def get_schema(schema_path):
 if __name__ == '__main__':
     key_schema = get_schema('./avro/Key.avsc')
     event_schema = get_schema('./avro/Event.avsc')
-    schema_registry_conf = {'url': 'http://localhost:8081'}
 
     factory = KafkaAvroSinkFactory(['localhost:9092'], 'http://localhost:8081', 'doge-kafka-example')
     sink = factory.create('test_avro_topic', key_function, key_schema, value_function, event_schema)
