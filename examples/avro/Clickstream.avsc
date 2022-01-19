@@ -1,0 +1,10 @@
+{
+  "namespace": "com.getindata.doge",
+  "type": "record",
+  "name": "Value",
+  "fields": [
+    { "name": "user_id", "type": "string"},
+    { "name": "event", "type": "string"},
+    { "name": "timestamp", "type": "long"}
+  ]
+}

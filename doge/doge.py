@@ -1,30 +1,27 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import List, Dict, Callable, Iterable, Set
+from typing import List, Dict, Callable, Iterable, Set, TypeVar, Generic
 from random import choices
 
 
-class Subject(object):
-    """
-    Subject instance represents a single item that traverse defined state machine. It also can be used to hold data
-    that can be modified and emitted during transitions. On its own it provides no methods nor attributes.
-    It is expected that attributes will be provided by SubjectFactory during creation time.
-    """
-    def __init__(self):
-        return
+Subject = TypeVar('Subject')
 
 
-class SubjectFactory(object):
+class SubjectFactory(Generic[Subject]):
     """
     SubjectFactory creates instances of Subject class. In order to provide attributes to Subject class it is
     expected that SubjectFactory will be extended.
     """
+    @abstractmethod
     def create(self) -> Subject:
         """
+        Subject instance represents a single item that traverse defined state machine. It also can be used to hold data
+        that can be modified and emitted during transitions. On its own it provides no methods nor attributes.
+        It is expected that attributes will be provided by SubjectFactory during creation time.
         :return: a new Subject instance
         :rtype: Subject
         """
-        return Subject()
+        pass
 
 
 class EventSink(ABC):
@@ -37,7 +34,7 @@ class EventSink(ABC):
         Executed during state machine transition.
         :param timestamp: event timestamp
         :type timestamp: int
-        :param subject: subject intsance that makes a transition
+        :param subject: subject instance that makes a transition
         :type subject: Subject
         :param transition: transition instance on which subject travels
         :type transition: Transition
@@ -62,16 +59,16 @@ class Transition(object):
                  to_state: str,
                  probability: float,
                  action_callback: Callable[[Subject, 'Transition'], bool] = None,
-                 event_sink: EventSink = None):
+                 event_sinks: List[EventSink] = None):
         self.trigger = trigger
         self.from_state = from_state
         self.to_state = to_state
         self.probability = probability
         self.action_callback = action_callback
-        self.event_sink = event_sink
+        self.event_sinks = event_sinks or ()
 
 
-class DataOnlineGenerator(object):
+class DataOnlineGenerator(Generic[Subject]):
     """
     DataOnlineGenerator is a state machine which is traversed by multiple subjects automatically based on probability
     defined for each possible transition.
@@ -84,7 +81,7 @@ class DataOnlineGenerator(object):
     STAY_TRIGGER = "__stay"
     transition_matrix: Dict[str, Dict[str, Transition]]
     probability_matrix: Dict[str, Dict[str, float]]
-    subject_states: Dict[Subject, str]
+    subjects_states: Dict[Subject, str]
     sinks: Set[EventSink]
 
     def __init__(self,
@@ -129,7 +126,7 @@ class DataOnlineGenerator(object):
                        to_state: str,
                        probability: float,
                        action_callback: Callable[[Subject, 'Transition'], bool] = None,
-                       event_sink: EventSink = None):
+                       event_sinks: List[EventSink] = None):
         """
         :param trigger: name of the trigger that triggers this transition. Has to be unique across all transitions
             from state :param from_state
@@ -138,23 +135,23 @@ class DataOnlineGenerator(object):
         :type from_state: str
         :param to_state: name of the state transition points to
         :type to_state: str
-        :param probability: probability of Subject choosing this transition when being in state :param fromstate
+        :param probability: probability of Subject choosing this transition when being in state :param from_state
         :type probability: float
         :param action_callback: optional function that accepts Subject and Transition and returns a boolean value.
             It allows subject state manipulation and its return value is used as a condition for transition. If False
             is returned subject will stay in current state, transition will be not made and no event will be emitted.
         :type action_callback: Callable[[Subject, 'Transition'], bool]
-        :param event_sink: optional instance of EventSink class. During transition event_sink method collect will
+        :param event_sinks: optional instance of EventSink class. During transition event_sink method collect will
             be called.
-        :type event_sink: EventSink
+        :type event_sinks: EventSink
         """
         if from_state not in self.states or to_state not in self.states:
             raise ValueError('State is not present in machine states')
 
-        if event_sink:
-            self.sinks.add(event_sink)
+        if event_sinks:
+            self.sinks.update(event_sinks)
 
-        transition = Transition(trigger, from_state, to_state, probability, action_callback, event_sink)
+        transition = Transition(trigger, from_state, to_state, probability, action_callback, event_sinks)
 
         if from_state in self.transition_matrix:
             self.transition_matrix[from_state][trigger] = transition
@@ -198,8 +195,8 @@ class DataOnlineGenerator(object):
                     should_transition = transition.action_callback(subject, transition)
                 if should_transition:
                     self.subjects_states[subject] = transition.to_state
-                    if transition.event_sink:
-                        transition.event_sink.collect(self.timestamp, subject, transition)
+                    for sink in transition.event_sinks:
+                        sink.collect(self.timestamp, subject, transition)
 
         self.timestamp += self.tick_ms
 
@@ -215,5 +212,3 @@ class DataOnlineGenerator(object):
             self.__tick()
         self.__close_sinks()
         print("Data generation finished:", datetime.now())
-
-

@@ -1,10 +1,10 @@
 from typing import Dict, Any
 
-from doge import Subject, Transition, DbSinkFactory
-from examples.doge_example_common import create_example_data_online_generator
+from doge import Transition, DbSinkFactory
+from examples.doge_example_common import create_example_data_online_generator, User
 
 
-def row_mapper_function(timestamp: int, subject: Subject, transition: Transition) -> Dict[str, Any]:
+def row_mapper_function(timestamp: int, subject: User, transition: Transition) -> Dict[str, Any]:
     row = {
         'timestamp': timestamp,
         'user_id': subject.user_id,
@@ -22,4 +22,3 @@ if __name__ == '__main__':
     datagen = create_example_data_online_generator(sink)
 
     datagen.start()
-
