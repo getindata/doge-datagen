@@ -12,6 +12,8 @@ requests = "*"
 
 [dev-packages]
 pytest = "*"
+mock = "*"
+testcontainers = {version = "*", extras = ["postgres", "kafka", "general"]}
 
 [requires]
 python_version = "3.8"
