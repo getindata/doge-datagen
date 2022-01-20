@@ -1,3 +1,4 @@
+import os
 from typing import Dict, Any
 
 from doge import Transition, DbSinkFactory
@@ -16,7 +17,8 @@ def row_mapper_function(timestamp: int, subject: User, transition: Transition) -
 
 
 if __name__ == '__main__':
-    factory = DbSinkFactory('postgresql://postgres:postgres@localhost:5432/postgres')
+    db_pass = os.getenv('PGPASSWORD', 'postgres')
+    factory = DbSinkFactory('postgresql://postgres:{}@localhost:5432/postgres'.format(db_pass))
     sink = factory.create('events', row_mapper_function)
 
     datagen = create_example_data_online_generator(sink)

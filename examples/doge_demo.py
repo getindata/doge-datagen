@@ -1,3 +1,4 @@
+import os
 from typing import Dict, Any
 
 from doge import DataOnlineGenerator, KafkaAvroSinkFactory, DbSinkFactory, Subject, Transition
@@ -7,7 +8,8 @@ from doge_kafka_avro_example import key_function, get_schema
 
 # Common
 kafka_avro_factory = KafkaAvroSinkFactory(['localhost:9092'], 'http://localhost:8081', 'doge-demo')
-db_factory = DbSinkFactory('postgresql://postgres:postgres@localhost:5432/postgres')
+db_pass = os.getenv('PGPASSWORD', 'postgres')
+db_factory = DbSinkFactory('postgresql://postgres:{}@localhost:5432/postgres'.format(db_pass))
 key_schema = get_schema('./avro/Key.avsc')
 
 # TRX definition
