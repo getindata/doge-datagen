@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
+import time
 from typing import List, Dict, Callable, Iterable, Set, TypeVar, Generic
 from random import choices
 
@@ -211,6 +212,7 @@ class DataOnlineGenerator(Generic[Subject]):
             sink.close()
 
     def start(self):
+        start = time.time()
         print("Data generation start:", datetime.now())
         self.__generate_subjects()
         self.__add_stay_transitions()
@@ -218,3 +220,5 @@ class DataOnlineGenerator(Generic[Subject]):
             self.__tick()
         self.__close_sinks()
         print("Data generation finished:", datetime.now())
+        end = time.time()
+        print("Execution took {} s".format(end - start))

@@ -11,7 +11,8 @@ class KafkaAvroSinkFactory(object):
     def __init__(self,
                  bootstrap_servers: Iterable[str],
                  schema_registry_url: str,
-                 client_id: str):
+                 client_id: str,
+                 buffer_size=100000):
         """
         :param bootstrap_servers: list of bootstrap servers
         :type bootstrap_servers: Iterable[str]
@@ -20,7 +21,7 @@ class KafkaAvroSinkFactory(object):
         :param client_id: sink client id
         :type client_id: str
         """
-        self.factory = KafkaSinkFactory(bootstrap_servers, client_id)
+        self.factory = KafkaSinkFactory(bootstrap_servers, client_id, buffer_size)
         schema_registry_conf = {'url': schema_registry_url}
         self.schema_registry_client = SchemaRegistryClient(schema_registry_conf)
 

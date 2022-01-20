@@ -9,30 +9,44 @@ K = TypeVar('K')
 V = TypeVar('V')
 
 
+class CounterHolder:
+    def __init__(self):
+        self.counter = 0
+
+
 class KafkaSink(EventSink):
     def __init__(self,
                  producer: Producer,
+                 msg_count_holder: CounterHolder,
                  topic: str,
                  key_function: Callable[[Subject, Transition], K],
                  key_serializer: Serializer,
                  value_function: Callable[[int, Subject, Transition], V],
-                 value_serializer: Serializer):
+                 value_serializer: Serializer,
+                 buffer_size=100000):
         self.producer = producer
+        self.msg_count_holder = msg_count_holder
         self.topic = topic
         self.key_function = key_function
         self.key_serializer = key_serializer
         self.value_function = value_function
         self.value_serializer = value_serializer
+        self.buffer_size = buffer_size
 
     def collect(self, timestamp: int, subject: Subject, transition: 'Transition'):
+
         key_ctx = SerializationContext(self.topic, MessageField.KEY)
         key = self.key_serializer(self.key_function(subject, transition), key_ctx)
         value_ctx = SerializationContext(self.topic, MessageField.VALUE)
         value = self.value_serializer(self.value_function(timestamp, subject, transition), value_ctx)
+        if self.msg_count_holder.counter >= self.buffer_size:
+            self.producer.flush()
+            self.msg_count_holder.counter = 0
         self.producer.produce(self.topic,
                               key=key,
                               value=value,
                               timestamp=timestamp)
+        self.msg_count_holder.counter += 1
 
     def close(self):
         self.producer.flush()
@@ -41,7 +55,8 @@ class KafkaSink(EventSink):
 class KafkaSinkFactory(object):
     def __init__(self,
                  bootstrap_servers: Iterable[str],
-                 client_id: str):
+                 client_id: str,
+                 buffer_size=100000):
         """
         :param bootstrap_servers: list of bootstrap servers
         :type bootstrap_servers: Iterable[str]
@@ -53,6 +68,9 @@ class KafkaSinkFactory(object):
             'client.id': client_id,
         }
         self.producer = Producer(conf)
+        self.msg_count = 0
+        self.buffer_size = buffer_size
+        self.counter_holder = CounterHolder()
 
     def create(self, topic: str,
                key_function: Callable[[Subject, Transition], K],
@@ -74,4 +92,11 @@ class KafkaSinkFactory(object):
         :return: KafkaSink instance
         :rtype: KafkaSink
         """
-        return KafkaSink(self.producer, topic, key_function, key_serializer, value_function, value_serializer)
+        return KafkaSink(self.producer,
+                         self.counter_holder,
+                         topic,
+                         key_function,
+                         key_serializer,
+                         value_function,
+                         value_serializer,
+                         self.buffer_size)
