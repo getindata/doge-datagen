@@ -1,9 +1,8 @@
+import time
 from abc import ABC, abstractmethod
 from datetime import datetime
-import time
+from random import random
 from typing import List, Dict, Callable, Iterable, Set, TypeVar, Generic
-from random import choices
-
 
 Subject = TypeVar('Subject')
 
@@ -192,8 +191,7 @@ class DataOnlineGenerator(Generic[Subject]):
 
     def __tick(self):
         for subject, state in self.subjects_states.items():
-            trigger = choices(list(self.probability_matrix[state].keys()),
-                              list(self.probability_matrix[state].values()))[0]
+            trigger = self.__random_trigger(state)
             transition = self.transition_matrix[state][trigger]
 
             if not trigger == self.STAY_TRIGGER:
@@ -206,6 +204,15 @@ class DataOnlineGenerator(Generic[Subject]):
                         sink.collect(self.timestamp, subject, transition)
 
         self.timestamp += self.tick_ms
+
+    # this is faster than using random.choice()
+    def __random_trigger(self, state: str) -> str:
+        rand = random() * 100
+        cum = 0
+        for key, probability in self.probability_matrix[state].items():
+            cum += probability
+            if rand < cum:
+                return key
 
     def __close_sinks(self):
         for sink in self.sinks:
