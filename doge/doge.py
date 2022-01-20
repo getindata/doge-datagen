@@ -109,6 +109,7 @@ class DataOnlineGenerator(Generic[Subject]):
         :type timestamp_start: int
         """
         self.states = states
+        self.__validate_state_defined(initial_state)
         self.initial_state = initial_state
         self.subject_factory = subject_factory
         self.subjects_num = subjects_num
@@ -146,8 +147,8 @@ class DataOnlineGenerator(Generic[Subject]):
             be called.
         :type event_sinks: EventSink
         """
-        if from_state not in self.states or to_state not in self.states:
-            raise ValueError('State is not present in machine states')
+        self.__validate_state_defined(from_state)
+        self.__validate_state_defined(to_state)
 
         if event_sinks:
             self.sinks.update(event_sinks)
@@ -175,6 +176,10 @@ class DataOnlineGenerator(Generic[Subject]):
         probability_sum = self.__get_probability_sum(transitions)
         if probability_sum > 100:
             raise ValueError("Sum of probabilities for state", state, "have exceeded 100%!")
+
+    def __validate_state_defined(self, state: str):
+        if state not in self.states:
+            raise ValueError('State {} is not present in machine states {}'.format(state, self.states))
 
     @staticmethod
     def __get_probability_sum(transitions: Iterable[Transition]) -> float:
