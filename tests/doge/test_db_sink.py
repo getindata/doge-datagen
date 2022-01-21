@@ -36,3 +36,8 @@ class TestDbSink:
 
         row = engine.execute("select * from some_table").fetchone()
         assert row['some_column'] == 'some_value'
+
+    def test_table_exist_validation(self, postgres):
+        factory = DbSinkFactory(postgres.get_connection_url())
+        with pytest.raises(ValueError):
+            factory.create('some_other_table', row_mapper_function)
