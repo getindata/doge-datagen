@@ -19,6 +19,7 @@ class DbSink(EventSink):
         self.batch: List[Dict[str, Any]] = []
         self.row_mapper_function = row_mapper_function
         self.batch_size = batch_size
+        self.__validate_table_exists()
 
     def collect(self, timestamp: int, subject: Subject, transition: 'Transition'):
         row = self.row_mapper_function(timestamp, subject, transition)
@@ -33,6 +34,10 @@ class DbSink(EventSink):
     def __insert_batch(self):
         self.engine.execute(self.table.insert(), self.batch)
         self.batch = []
+
+    def __validate_table_exists(self):
+        if not self.table.exists(bind=self.engine):
+            raise ValueError("Table {} does not exist".format(self.table.name))
 
 
 class DbSinkFactory(object):
