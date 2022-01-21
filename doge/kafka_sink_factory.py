@@ -1,6 +1,7 @@
+import sys
 from typing import Iterable, Callable, TypeVar
 
-from confluent_kafka import Producer
+from confluent_kafka import Producer, Message, KafkaError
 from confluent_kafka.serialization import SerializationContext, StringSerializer, Serializer, MessageField
 
 from doge import Subject, Transition, EventSink
@@ -33,6 +34,11 @@ class KafkaSink(EventSink):
         self.value_serializer = value_serializer
         self.buffer_size = buffer_size
 
+    @staticmethod
+    def __on_delivery(err: KafkaError, msg: Message):
+        if err:
+            print(str(err), file=sys.stderr)
+
     def collect(self, timestamp: int, subject: Subject, transition: 'Transition'):
 
         key_ctx = SerializationContext(self.topic, MessageField.KEY)
@@ -45,7 +51,8 @@ class KafkaSink(EventSink):
         self.producer.produce(self.topic,
                               key=key,
                               value=value,
-                              timestamp=timestamp)
+                              timestamp=timestamp,
+                              on_delivery=self.__on_delivery)
         self.msg_count_holder.counter += 1
 
     def close(self):
