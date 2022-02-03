@@ -1,6 +1,6 @@
 from typing import Dict, Any
 
-from doge import Transition, KafkaAvroSinkFactory
+from doge_datagen import Transition, KafkaAvroSinkFactory
 from examples.doge_example_common import create_example_data_online_generator, User
 
 

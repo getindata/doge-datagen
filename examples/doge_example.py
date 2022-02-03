@@ -1,5 +1,4 @@
-from doge import PrintingSink
-from doge.doge import Transition
+from doge_datagen import PrintingSink, Transition
 from examples.doge_example_common import create_example_data_online_generator, User
 
 

@@ -6,7 +6,7 @@ from setuptools import find_packages
 from setuptools.command.install import install
 
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -34,7 +34,7 @@ class VerifyVersionCommand(install):
 
 
 setup(
-    name="doge",
+    name="doge_datagen",
     version=__version__,
     author="GetInData",
     author_email="office@getindata.com",
@@ -48,7 +48,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     install_requires=get_requirements('requirements.txt'),
-    py_modules=['doge'],
+    py_modules=['doge_datagen'],
     cmdclass={
         'verify': VerifyVersionCommand,
     }

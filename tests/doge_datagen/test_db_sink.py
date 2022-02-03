@@ -5,7 +5,7 @@ import pytest
 import sqlalchemy
 from testcontainers.postgres import PostgresContainer
 
-from doge import DbSinkFactory, Subject, Transition
+from doge_datagen import DbSinkFactory, Subject, Transition
 
 
 def row_mapper_function(timestamp: int, subject: Subject, transition: Transition) -> Dict[str, Any]:

@@ -1,6 +1,6 @@
 import json
 
-from doge import Transition, KafkaSinkFactory
+from doge_datagen import Transition, KafkaSinkFactory
 from examples.doge_example_common import create_example_data_online_generator, User
 
 

@@ -3,7 +3,7 @@ from typing import Iterable, Callable, Any, Dict
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroSerializer
 
-from doge import Subject, Transition, KafkaSinkFactory, KafkaSink
+from doge_datagen import Subject, Transition, KafkaSinkFactory, KafkaSink
 
 
 class KafkaAvroSinkFactory(object):
