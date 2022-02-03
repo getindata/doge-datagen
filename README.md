@@ -1,4 +1,4 @@
-# Data Online Generator (DOGE)
+# Data Online Generator (doge_datagen)
 
 ## Description
 DataOnlineGenerator can be used to simulate user, system or other actor behaviour bases on probabilistic model. 

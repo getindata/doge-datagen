@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from random import randrange
 
-from doge import Transition, SubjectFactory, DataOnlineGenerator
+from doge_datagen import Transition, SubjectFactory, DataOnlineGenerator
 
 
 @dataclass

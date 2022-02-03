@@ -4,7 +4,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from doge import DataOnlineGenerator, SubjectFactory
+from doge_datagen import DataOnlineGenerator, SubjectFactory
 
 
 @dataclass

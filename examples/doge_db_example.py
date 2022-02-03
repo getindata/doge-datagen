@@ -1,7 +1,7 @@
 import os
 from typing import Dict, Any
 
-from doge import Transition, DbSinkFactory
+from doge_datagen import Transition, DbSinkFactory
 from examples.doge_example_common import create_example_data_online_generator, User
 
 

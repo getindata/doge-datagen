@@ -9,7 +9,7 @@ from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroDeserializer
 from testcontainers.kafka import KafkaContainer
 
-from doge import KafkaAvroSinkFactory, Subject, Transition
+from doge_datagen import KafkaAvroSinkFactory, Subject, Transition
 from tests.testcontainers.schemaregistry import SchemaRegistryContainer
 
 TEST_TOPIC = 'test-topic'

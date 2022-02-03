@@ -3,8 +3,8 @@ from typing import Callable, Dict, Any, List
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.engine import Engine
 
-from doge import Subject, Transition
-from doge import EventSink
+from doge_datagen import Subject, Transition
+from doge_datagen import EventSink
 
 
 class DbSink(EventSink):

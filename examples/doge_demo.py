@@ -1,7 +1,7 @@
 import os
 from typing import Dict, Any
 
-from doge import DataOnlineGenerator, KafkaAvroSinkFactory, DbSinkFactory, Subject, Transition
+from doge_datagen import DataOnlineGenerator, KafkaAvroSinkFactory, DbSinkFactory, Subject, Transition
 
 from examples.doge_example_common import income_callback, spending_callback, take_loan_callback, UserFactory, User
 from examples.doge_kafka_avro_example import key_function, get_schema

@@ -4,7 +4,7 @@ from typing import Iterable, Callable, TypeVar
 from confluent_kafka import Producer, Message, KafkaError
 from confluent_kafka.serialization import SerializationContext, StringSerializer, Serializer, MessageField
 
-from doge import Subject, Transition, EventSink
+from doge_datagen import Subject, Transition, EventSink
 
 K = TypeVar('K')
 V = TypeVar('V')

@@ -1,6 +1,6 @@
 from typing import Callable
 
-from doge import Subject, Transition, EventSink
+from doge_datagen import Subject, Transition, EventSink
 
 
 class PrintingSink(EventSink):
