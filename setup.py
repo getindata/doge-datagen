@@ -40,6 +40,8 @@ setup(
     author_email="office@getindata.com",
     description="Data Online Generator",
     long_description=long_description,
+    long_description_content_type="text/markdown",
+    license="Apache Software License (Apache 2.0)",
     url="https://github.com/getindata/doge-datagen",
     packages=find_packages(),
     python_requires='>=3.8',
