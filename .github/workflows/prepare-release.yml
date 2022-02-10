@@ -31,7 +31,7 @@ jobs:
         run: |
           pip install bump2version
           bump2version ${{ github.event.inputs.version_part }}
-          echo "::set-output name=package_version::$(cat $PYTHON_PACKAGE/__init__.py | grep -Po  '\d+\.\d+\.\d+')"
+          echo "::set-output name=package_version::$(cat setup.cfg | grep -A 1 "\[bumpversion\]" | grep -Po  '\d+\.\d+\.\d+')"
       - name: Update the CHANGELOG according to 'Keep a Changelog' guidelines
         uses: thomaseizinger/keep-a-changelog-new-release@v1
         with:
