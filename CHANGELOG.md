@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
-- First release
+## [1.0.1] - 2022-02-10
 
-[Unreleased]: https://github.com/getindata/doge-datagen/compare/21d1479f91d40688930a0e8208768c0446adeb3b...HEAD
+-   First release
+
+[Unreleased]: https://github.com/getindata/doge-datagen/compare/1.0.1...HEAD
+
+[1.0.1]: https://github.com/getindata/doge-datagen/compare/d47c49d10b0370021791f1f429a5d3cb0e77d02e...1.0.1
