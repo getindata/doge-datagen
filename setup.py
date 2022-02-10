@@ -6,7 +6,7 @@ from setuptools import find_packages
 from setuptools.command.install import install
 
 
-__version__ = "0.2.0"
+__version__ = "1.0.0"
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -40,7 +40,7 @@ setup(
     author_email="office@getindata.com",
     description="Data Online Generator",
     long_description=long_description,
-    url="https://gitlab.com/getindata/streaming-labs/doge",
+    url="https://github.com/getindata/doge-datagen",
     packages=find_packages(),
     python_requires='>=3.8',
     classifiers=[
