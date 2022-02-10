@@ -16,30 +16,21 @@ jobs:
       - name: Setup python
         uses: actions/setup-python@v2.2.1
         with:
-          python-version: 3.7
+          python-version: 3.8
 
       - name: Setup virtualenv
         run: |
           python -V
-          python -m pip install virtualenv
-          virtualenv venv
-          source venv/bin/activate
+          python -m pip install pipenv
+          pipenv lock -r > requirements.txt
 
-      - name: Check pre-commit status
+      - name: Test
         run: |
-          pip install .[tests]
-          pre-commit run --all-files
+          pip install pipenv
+          pipenv install --dev
+          pipenv run pytest
 
-      - name: Test with tox
+      - name: Wheel
         run: |
-          pip install tox-pip-version
-          tox -v -e py37
-
-      - name: Report coverage
-        uses: paambaati/codeclimate-action@v2.7.5
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CODE_CLIMATE }}
-        with:
-          coverageCommand: coverage xml
-          debug: true
-          coverageLocations: coverage.xml:coverage.py
+          python setup.py sdist
+          
