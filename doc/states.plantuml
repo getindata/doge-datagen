@@ -1,4 +1,8 @@
 @startuml
+hide empty description
+skinparam state {
+    BackgroundColor white
+}
 state Offline
 state Online
 state "Loan Screen" as LoanScreen
