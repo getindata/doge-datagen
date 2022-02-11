@@ -1,5 +1,11 @@
 # Data Online Generator (doge_datagen)
 
+[![Python Version](https://img.shields.io/badge/python-3.8-blue.svg)](https://github.com/getindata/doge-datagen)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![SemVer](https://img.shields.io/badge/semver-2.0.0-green)](https://semver.org/)
+[![PyPI version](https://badge.fury.io/py/doge-datagen.svg)](https://pypi.org/project/doge-datagen/)
+[![Downloads](https://pepy.tech/badge/doge-datagen)](https://pepy.tech/badge/doge-datagen)
+
 ## Description
 DataOnlineGenerator can be used to simulate user, system or other actor behaviour bases on probabilistic model. 
 It is a state machine which is traversed by multiple subjects automatically based on probability defined for each 
@@ -15,6 +21,14 @@ State machine works in ticks which length and number is defined in constructor. 
 evaluates each subject and makes a transition based on provided probabilities. Sum of probabilities of doing 
 a transition from given state have to be less or equal to 100. If probabilities of all transitions are less than 100 
 remaining value is treated as probability of staying in the same state in given tick.
+
+## Installation
+
+Package is available in PyPI https://pypi.org/project/doge-datagen/
+
+```shell
+pip install -U doge-datagen
+```
 
 ## Usage
 
