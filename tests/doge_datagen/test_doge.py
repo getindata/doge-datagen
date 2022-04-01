@@ -59,6 +59,26 @@ class TestDoge:
                                                 1000, SOME_SUBJECT_2, TRANSITION_2, STATE_2, STATE_3)
         event_sink.close.assert_called()
 
+    def test_should_transition_to_final_state(self):
+        factory = self.__create_factory_mock([SOME_SUBJECT_1])
+        action_callback = Mock(return_value=True)
+        event_sink = Mock()
+        doge = DataOnlineGenerator([STATE_1, STATE_2],
+                                   STATE_1,
+                                   factory,
+                                   1, 1000, 2)
+        doge.add_transition(TRANSITION_1, STATE_1, STATE_2, 100, action_callback, [event_sink])
+
+        doge.start()
+
+        assert action_callback.call_count == 1
+        self.__assert_action_called(action_callback.call_args_list[0].args,
+                                    SOME_SUBJECT_1, TRANSITION_1, STATE_1, STATE_2)
+        assert event_sink.collect.call_count == 1
+        self.__assert_event_sink_collect_called(event_sink.collect.call_args_list[0].args,
+                                                0, SOME_SUBJECT_1, TRANSITION_1, STATE_1, STATE_2)
+        event_sink.close.assert_called()
+
     def test_should_fail_to_transition_once(self):
         factory = self.__create_factory_mock([SOME_SUBJECT_1])
         action_callback = Mock()

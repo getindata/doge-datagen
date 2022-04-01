@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- Use logging
+- Fix [Issue 12](https://github.com/getindata/doge-datagen/issues/12)
+
 ## [1.0.3] - 2022-02-11
 
 ## [1.0.2] - 2022-02-10
