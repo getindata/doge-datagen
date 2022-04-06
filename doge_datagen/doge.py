@@ -1,10 +1,17 @@
+import logging
+import os
 import time
+
 from abc import ABC, abstractmethod
 from datetime import datetime
 from random import random
 from typing import List, Dict, Callable, Iterable, Set, TypeVar, Generic
 
+
 Subject = TypeVar('Subject')
+
+logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
+LOGGER = logging.getLogger(__name__)
 
 
 class SubjectFactory(Generic[Subject]):
@@ -116,10 +123,16 @@ class DataOnlineGenerator(Generic[Subject]):
         self.tick_ms = tick_ms
         self.ticks_num = ticks_num
         self.timestamp = timestamp_start
-        self.transition_matrix = {}
-        self.probability_matrix = {}
+        self.__init_matrices()
         self.subjects_states = {}
         self.sinks = set()
+
+    def __init_matrices(self):
+        self.transition_matrix = {}
+        self.probability_matrix = {}
+        for state in self.states:
+            self.transition_matrix[state] = {}
+            self.probability_matrix[state] = {}
 
     def add_transition(self,
                        trigger: str,
@@ -155,18 +168,17 @@ class DataOnlineGenerator(Generic[Subject]):
 
         transition = Transition(trigger, from_state, to_state, probability, action_callback, event_sinks)
 
-        if from_state in self.transition_matrix:
-            self.transition_matrix[from_state][trigger] = transition
-            self.probability_matrix[from_state][trigger] = probability
-        else:
-            self.transition_matrix[from_state] = {trigger: transition}
-            self.probability_matrix[from_state] = {trigger: probability}
+        self.transition_matrix[from_state][trigger] = transition
+        self.probability_matrix[from_state][trigger] = probability
 
         self.__validate_probability_sum(from_state)
 
     def __add_stay_transitions(self):
-        for state, transitions in self.transition_matrix.items():
-            stay_probability = 100 - self.__get_probability_sum(transitions.values())
+        for state in self.states:
+            transitions = self.transition_matrix[state].values()
+            if len(transitions) == 0:
+                LOGGER.warning("State {} is a final state and has no output transitions".format(state))
+            stay_probability = 100 - self.__get_probability_sum(transitions)
             self.transition_matrix[state][self.STAY_TRIGGER] = \
                 Transition(self.STAY_TRIGGER, state, state, stay_probability)
             self.probability_matrix[state][self.STAY_TRIGGER] = stay_probability
@@ -175,7 +187,7 @@ class DataOnlineGenerator(Generic[Subject]):
         transitions = self.transition_matrix[state].values()
         probability_sum = self.__get_probability_sum(transitions)
         if probability_sum > 100:
-            raise ValueError("Sum of probabilities for state", state, "have exceeded 100%!")
+            raise ValueError("Sum of probabilities for state {} have exceeded 100%!".format(state))
 
     def __validate_state_defined(self, state: str):
         if state not in self.states:
@@ -220,12 +232,12 @@ class DataOnlineGenerator(Generic[Subject]):
 
     def start(self):
         start = time.time()
-        print("Data generation start:", datetime.now())
+        LOGGER.info("Data generation start: {}".format(datetime.now()))
         self.__generate_subjects()
         self.__add_stay_transitions()
         for i in range(self.ticks_num):
             self.__tick()
         self.__close_sinks()
-        print("Data generation finished:", datetime.now())
+        LOGGER.info("Data generation finished: {}".format(datetime.now()))
         end = time.time()
-        print("Execution took {} s".format(end - start))
+        LOGGER.info("Execution took {} s".format(end - start))
