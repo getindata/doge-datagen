@@ -6,7 +6,7 @@ from setuptools import find_packages
 from setuptools.command.install import install
 
 
-__version__ = "1.0.3"
+__version__ = "1.0.4"
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
