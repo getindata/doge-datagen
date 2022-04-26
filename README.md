@@ -64,6 +64,22 @@ Users. We also provide tick length (1 min) and number of ticks (1000).
 Probability of login into application 0.1 [%] can be interpreted as on average 1/1000 of all users in each minute will 
 log in or that specific User will log in to an app on average once in 1000 minutes (a little more than once a day).
 
+### Generator state graph
+Data Online Generator provides a convenient way of presentation of the created data model in the form of the
+graph renderer module. This module parses the state machine definition and renders its graph - 
+the nodes are labelled by the state names, while the edges are labelled by trigger name and transition probability.
+
+#### Usage
+In order to render the generator's state, let's define and use the graph renderer:
+
+```python
+    graph = DataOnlineGeneratorGrapher(datagen)
+    graph.render()
+```
+
+This gives us the following result:
+![Grapher output](doc/grapher.png)
+
 ### Sink factories
 
 #### Printing sink
