@@ -1,7 +1,7 @@
 # Changelog
 
 ## [Unreleased]
-
+- Add generator's transitions graphing capabilities
 ## [1.0.4] - 2022-04-11
 
 -   Use logging
