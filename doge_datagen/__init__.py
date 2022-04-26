@@ -4,6 +4,7 @@ from .doge import Transition
 from .doge import DataOnlineGenerator
 from .doge import EventSink
 
+from .graph import DataOnlineGeneratorGrapher
 from .db_sink_factory import DbSinkFactory, DbSink
 from .kafka_sink_factory import KafkaSinkFactory, KafkaSink
 from .kafka_avro_sink_factory import KafkaAvroSinkFactory

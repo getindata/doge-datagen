@@ -9,6 +9,7 @@ SQLAlchemy = "*"
 psycopg2-binary = "*"
 fastavro = "*"
 requests = "*"
+graphviz = "*"
 
 [dev-packages]
 pytest = "*"
