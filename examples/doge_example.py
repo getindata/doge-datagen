@@ -1,5 +1,5 @@
-from doge_datagen import PrintingSink, Transition
-from examples.doge_example_common import create_example_data_online_generator, User
+from doge_datagen.printing_sink import PrintingSink, Transition
+from doge_example_common import create_example_data_online_generator, User
 
 
 def format_function(timestamp: int, user: User, transition: Transition) -> str:

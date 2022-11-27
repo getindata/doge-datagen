@@ -30,8 +30,28 @@ if __name__ == '__main__':
     key_schema = get_schema('./avro/Key.avsc')
     event_schema = get_schema('./avro/Event.avsc')
 
-    factory = KafkaAvroSinkFactory(['localhost:9092'], 'http://localhost:8081', 'doge-kafka-example')
-    sink = factory.create('test_avro_topic', key_function, key_schema, value_function, event_schema)
+    # Kafka Configuration - for OCI Streaming
+    kafkaConf = {
+        'bootstrap.servers': 'cell-1.streaming.<region>.oci.oraclecloud.com:9092', #usually of the form cell-1.streaming.<region>.oci.oraclecloud.com:9092  
+        'client.id': 'doge-kafka-example',
+        'security.protocol': 'SASL_SSL',
+        'sasl.mechanism': 'PLAIN',
+        'sasl.username': 'tenancyid/userid/streampoolid',
+        'sasl.password': 'pswd'
+    }
+
+    # Kafka Configuration - basic setup
+    kafkaConf = {
+        'bootstrap.servers': 'localhost:9092',  
+        'client.id': 'doge-kafka-example'
+    }
+
+    schema_registry_url = 'http://localhost:8081'
+
+    topic_name = 'test_avro_topic'
+
+    factory = KafkaAvroSinkFactory(kafkaConf, schema_registry_url)
+    sink = factory.create(topic_name, key_function, key_schema, value_function, event_schema)
 
     datagen = create_example_data_online_generator(sink)
 

@@ -22,7 +22,24 @@ def value_function(timestamp: int, subject: User, transition: Transition) -> str
 
 
 if __name__ == '__main__':
-    factory = KafkaSinkFactory(['localhost:9092'], 'doge-kafka-example')
+
+    # Kafka Configuration - for OCI Streaming
+    kafkaConf = {
+        'bootstrap.servers': 'cell-1.streaming.<region>.oci.oraclecloud.com:9092', #usually of the form cell-1.streaming.<region>.oci.oraclecloud.com:9092  
+        'client.id': 'doge-kafka-example',
+        'security.protocol': 'SASL_SSL',
+        'sasl.mechanism': 'PLAIN',
+        'sasl.username': 'tenancyid/userid/streampoolid',
+        'sasl.password': 'pswd'
+    }
+
+    # Kafka Configuration - basic setup
+    kafkaConf = {
+        'bootstrap.servers': 'localhost:9092',  
+        'client.id': 'doge-kafka-example'
+    }
+    
+    factory = KafkaSinkFactory(kafkaConf)
     sink = factory.create('test_topic', key_function, value_function)
 
     datagen = create_example_data_online_generator(sink)

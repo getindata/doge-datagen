@@ -6,8 +6,29 @@ from doge_datagen import DataOnlineGenerator, KafkaAvroSinkFactory, DbSinkFactor
 from examples.doge_example_common import income_callback, spending_callback, take_loan_callback, UserFactory, User
 from examples.doge_kafka_avro_example import key_function, get_schema
 
+# Kafka Configuration - for OCI Streaming
+kafkaConf = {
+    'bootstrap.servers': 'cell-1.streaming.<region>.oci.oraclecloud.com:9092', #usually of the form cell-1.streaming.<region>.oci.oraclecloud.com:9092  
+    'client.id': 'doge-kafka-example',
+    'security.protocol': 'SASL_SSL',
+    'sasl.mechanism': 'PLAIN',
+    'sasl.username': 'tenancyid/userid/streampoolid',
+    'sasl.password': 'pswd'
+}
+
+# Kafka Configuration - basic setup
+kafkaConf = {
+    'bootstrap.servers': 'localhost:9092',  
+    'client.id': 'doge-kafka-example'
+}
+
+schema_registry_url = 'http://localhost:8081'
+
+topic_name = "trx"
+
 # Common
-kafka_avro_factory = KafkaAvroSinkFactory(['localhost:9092'], 'http://localhost:8081', 'doge-demo')
+kafka_avro_factory = KafkaAvroSinkFactory(kafkaConf, schema_registry_url)
+
 db_pass = os.getenv('PGPASSWORD', 'postgres')
 db_factory = DbSinkFactory('postgresql://postgres:{}@localhost:5432/postgres'.format(db_pass))
 key_schema = get_schema('./avro/Key.avsc')
@@ -25,7 +46,7 @@ def trx_value_function(timestamp: int, subject: User, transition: Transition) ->
     return value
 
 
-trx_sink = kafka_avro_factory.create("trx", key_function, key_schema, trx_value_function, trx_event_schema)
+trx_sink = kafka_avro_factory.create(topic_name, key_function, key_schema, trx_value_function, trx_event_schema)
 
 
 # Clickstream definition
