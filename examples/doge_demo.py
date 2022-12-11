@@ -6,20 +6,16 @@ from doge_datagen import DataOnlineGenerator, KafkaAvroSinkFactory, DbSinkFactor
 from examples.doge_example_common import income_callback, spending_callback, take_loan_callback, UserFactory, User
 from examples.doge_kafka_avro_example import key_function, get_schema
 
+# Kafka Addtional Configuration - Optional
+bootstrup_servers = ['0.0.0.0:9092']
+client_id = 'doge-kafka-example'
+
 # Kafka Configuration - for OCI Streaming
-kafkaConf = {
-    'bootstrap.servers': 'cell-1.streaming.<region>.oci.oraclecloud.com:9092', #usually of the form cell-1.streaming.<region>.oci.oraclecloud.com:9092  
-    'client.id': 'doge-kafka-example',
+kafka_conf = {
     'security.protocol': 'SASL_SSL',
     'sasl.mechanism': 'PLAIN',
-    'sasl.username': 'tenancyid/userid/streampoolid',
+    'sasl.username': 'username',
     'sasl.password': 'pswd'
-}
-
-# Kafka Configuration - basic setup
-kafkaConf = {
-    'bootstrap.servers': 'localhost:9092',  
-    'client.id': 'doge-kafka-example'
 }
 
 schema_registry_url = 'http://localhost:8081'
@@ -27,7 +23,7 @@ schema_registry_url = 'http://localhost:8081'
 topic_name = "trx"
 
 # Common
-kafka_avro_factory = KafkaAvroSinkFactory(kafkaConf, schema_registry_url)
+kafka_avro_factory = KafkaAvroSinkFactory(bootstrup_servers, schema_registry_url, client_id, kafka_conf)
 
 db_pass = os.getenv('PGPASSWORD', 'postgres')
 db_factory = DbSinkFactory('postgresql://postgres:{}@localhost:5432/postgres'.format(db_pass))

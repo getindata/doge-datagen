@@ -3,7 +3,7 @@ from json import dumps
 from kafka import KafkaConsumer
 
 consumer = KafkaConsumer(
-    'transaction',
+    'test_topic',
      bootstrap_servers=['0.0.0.0:9092'],
      auto_offset_reset='earliest',
      enable_auto_commit=True,

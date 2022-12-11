@@ -17,7 +17,7 @@ services:
     depends_on:
       - zookeeper
     ports:
-      - 9092:29092
+      - 29092:29092
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -85,6 +85,19 @@ services:
       - my-db:/var/lib/mysql
       # - ./mysql/init.sql:/data/application/init.sql
 
-
+  psg:
+    image: postgres:14.1-alpine
+    container_name: psg
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    volumes: 
+      - psg-db:/var/lib/postgresql/data
+    
 volumes:
   my-db:
+  psg-db:

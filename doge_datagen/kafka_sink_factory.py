@@ -61,16 +61,30 @@ class KafkaSink(EventSink):
 
 class KafkaSinkFactory(object):
     def __init__(self,
-                conf: dict,
-                 buffer_size=100000
-                 ):
+                bootstrap_servers:Iterable[str],
+                client_id:str,
+                conf:dict=None,
+                buffer_size=100000
+                ):
 
         """
-        :pram conf : dict with configuration parameters specific for cloud providers
+        :param bootstrap_servers: list of bootstrap servers
+        :type bootstrap_servers: Iterable[str]
+        :param client_id: sink client id
+        :type client_id: str
+        :pram conf : dictionary with addtional configuration parameters
         :type conf: dictionary
         """
+        
+        conf_prime = {
+            'bootstrap.servers': ','.join(bootstrap_servers),
+            'client.id': client_id,
+        }
+        
+        if conf is not None:
+            conf_prime = conf_prime.update(conf)
 
-        self.producer = Producer(conf)
+        self.producer = Producer(conf_prime)
         self.msg_count = 0
         self.buffer_size = buffer_size
         self.counter_holder = CounterHolder()

@@ -22,17 +22,20 @@ if __name__ == '__main__':
     # Connecting to oracle data base
     oracle_dialect = oracle.dialect(max_identifier_length=30)
 
-    url_mysql = URL('mysql',
-      username='admin', password='admin',
-      host='localhost', port='3306',
-      database='testdb',
-      query=oracle_dialect)
+    ## Example url for mysql
+    # url_mysql = URL('mysql',
+    #   username='admin', password='admin',
+    #   host='localhost', port='3306',
+    #   database='testdb',
+    #   query=oracle_dialect)
+
+    # factory = DbSinkFactory(url_mysql)
 
     # Connecting to PSG data base
     url_postgres = 'postgresql://postgres:{}@localhost:5432/postgres'.format(db_pass)
 
     # Replace specific url depending on your needs
-    factory = DbSinkFactory(url_mysql)
+    factory = DbSinkFactory(url_postgres)
     sink = factory.create('events', row_mapper_function)
 
     datagen = create_example_data_online_generator(sink)
