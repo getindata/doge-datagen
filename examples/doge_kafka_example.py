@@ -23,12 +23,12 @@ def value_function(timestamp: int, subject: User, transition: Transition) -> str
 
 if __name__ == '__main__':
 
-    bootstrup_servers = ['localhost:9092']
+    bootstrap_servers = ['localhost:9092']
     client_id = 'doge-kafka-example'
 
     # Kafka Additional Configuration - optional
     kafka_conf = {
-        'bootstrap.servers': ','.join(bootstrup_servers),
+        'bootstrap.servers': ','.join(bootstrap_servers),
         'client.id': client_id,
         'security.protocol': 'SASL_SSL',
         'sasl.mechanism': 'PLAIN',
