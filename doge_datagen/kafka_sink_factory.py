@@ -63,7 +63,7 @@ class KafkaSinkFactory(object):
     def __init__(self,
                 bootstrap_servers:Iterable[str],
                 client_id:str,
-                conf:dict=None,
+                conf:dict={},
                 buffer_size=100000
                 ):
 
@@ -81,8 +81,7 @@ class KafkaSinkFactory(object):
             'client.id': client_id,
         }
         
-        if conf is not None:
-            conf_prime = conf_prime.update(conf)
+        conf_prime = conf_prime.update(conf)
 
         self.producer = Producer(conf_prime)
         self.msg_count = 0

@@ -12,7 +12,7 @@ class KafkaAvroSinkFactory(object):
                  bootstrap_servers: Iterable[str],
                  schema_registry_url: str,
                  client_id: str,
-                 conf:dict=None,
+                 conf:dict={},
                  buffer_size=100000):
         """
         :param bootstrap_servers: list of bootstrap servers
