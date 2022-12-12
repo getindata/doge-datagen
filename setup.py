@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 
@@ -12,11 +13,17 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 
-def get_requirements(filename):
-    with open(filename, "r", encoding="utf-8") as fp:
-        reqs = [x.strip() for x in fp.read().splitlines()
-                if not x.strip().startswith('#') and not x.strip().startswith('-i')]
-    return reqs
+def locked_requirements(section):
+    """Look through the 'Pipfile.lock' to fetch requirements by section."""
+    with open('Pipfile.lock') as pip_file:
+        pipfile_json = json.load(pip_file)
+
+    if section not in pipfile_json:
+        print("{0} section missing from Pipfile.lock".format(section))
+        return []
+
+    return [package + detail.get('version', "")
+            for package, detail in pipfile_json[section].items()]
 
 
 class VerifyVersionCommand(install):
@@ -49,7 +56,7 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Operating System :: OS Independent",
     ],
-    install_requires=get_requirements('requirements.txt'),
+    install_requires=locked_requirements('default'),
     py_modules=['doge_datagen'],
     cmdclass={
         'verify': VerifyVersionCommand,

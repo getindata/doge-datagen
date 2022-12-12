@@ -22,7 +22,7 @@ jobs:
         run: |
           python -V
           python -m pip install pipenv
-          pipenv lock -r > requirements.txt
+          pipenv lock
 
       - name: Test
         run: |
