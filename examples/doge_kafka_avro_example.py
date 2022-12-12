@@ -35,6 +35,8 @@ if __name__ == '__main__':
 
     # Kafka Configuration - for OCI Streaming
     kafka_conf = {
+        'bootstrap.servers': ','.join(bootstrup_servers),
+        'client.id': client_id,
         'security.protocol': 'SASL_SSL',
         'sasl.mechanism': 'PLAIN',
         'sasl.username': 'username',
@@ -45,7 +47,7 @@ if __name__ == '__main__':
 
     topic_name = 'test_avro_topic'
 
-    factory = KafkaAvroSinkFactory(bootstrup_servers, schema_registry_url, client_id, kafka_conf)
+    factory = KafkaAvroSinkFactory(schema_registry_url=schema_registry_url, conf=kafka_conf)
     sink = factory.create(topic_name, key_function, key_schema, value_function, event_schema)
 
     datagen = create_example_data_online_generator(sink)

@@ -61,9 +61,9 @@ class KafkaSink(EventSink):
 
 class KafkaSinkFactory(object):
     def __init__(self,
-                bootstrap_servers:Iterable[str],
-                client_id:str,
-                conf:dict={},
+                bootstrap_servers:Iterable[str]=None,
+                client_id:str=None,
+                conf:dict=None,
                 buffer_size=100000
                 ):
 
@@ -76,14 +76,13 @@ class KafkaSinkFactory(object):
         :type conf: dictionary
         """
         
-        conf_prime = {
-            'bootstrap.servers': ','.join(bootstrap_servers),
-            'client.id': client_id,
-        }
-        
-        conf_prime = conf_prime.update(conf)
+        if conf is None:
+            conf = {
+                'bootstrap.servers': ','.join(bootstrap_servers),
+                'client.id': client_id,
+            } 
 
-        self.producer = Producer(conf_prime)
+        self.producer = Producer(conf)
         self.msg_count = 0
         self.buffer_size = buffer_size
         self.counter_holder = CounterHolder()

@@ -28,6 +28,8 @@ if __name__ == '__main__':
 
     # Kafka Additional Configuration - optional
     kafka_conf = {
+        'bootstrap.servers': ','.join(bootstrup_servers),
+        'client.id': client_id,
         'security.protocol': 'SASL_SSL',
         'sasl.mechanism': 'PLAIN',
         'sasl.username': 'username',
@@ -36,7 +38,7 @@ if __name__ == '__main__':
 
     topic_name = 'test_topic'
     
-    factory = KafkaSinkFactory(bootstrup_servers, client_id, kafka_conf)
+    factory = KafkaSinkFactory(conf=kafka_conf)
     sink = factory.create(topic_name, key_function, value_function)
 
     datagen = create_example_data_online_generator(sink)

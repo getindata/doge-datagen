@@ -9,10 +9,10 @@ from doge_datagen import Subject, Transition, KafkaSinkFactory, KafkaSink
 class KafkaAvroSinkFactory(object):
 
     def __init__(self,
-                 bootstrap_servers: Iterable[str],
-                 schema_registry_url: str,
-                 client_id: str,
-                 conf:dict={},
+                 bootstrap_servers: Iterable[str]=None,
+                 schema_registry_url: str=None,
+                 client_id: str=None,
+                 conf:dict=None,
                  buffer_size=100000):
         """
         :param bootstrap_servers: list of bootstrap servers
@@ -23,7 +23,7 @@ class KafkaAvroSinkFactory(object):
         :type conf: dictionary
         :param client_id: sink client id
         :type client_id: str
-        """
+        """  
 
         self.factory = KafkaSinkFactory(bootstrap_servers, client_id, conf, buffer_size)
         schema_registry_conf = {'url': schema_registry_url}
