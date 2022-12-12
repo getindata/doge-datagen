@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 - Add generator's transitions graphing capabilities
+- Use Pipefile.lock instead of requrements.txt in setup.py
 ## [1.0.4] - 2022-04-11
 
 -   Use logging
