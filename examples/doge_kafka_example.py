@@ -22,8 +22,24 @@ def value_function(timestamp: int, subject: User, transition: Transition) -> str
 
 
 if __name__ == '__main__':
-    factory = KafkaSinkFactory(['localhost:9092'], 'doge-kafka-example')
-    sink = factory.create('test_topic', key_function, value_function)
+
+    bootstrap_servers = ['localhost:9092']
+    client_id = 'doge-kafka-example'
+
+    # Kafka Additional Configuration - optional
+    kafka_conf = {
+        'bootstrap.servers': ','.join(bootstrap_servers),
+        'client.id': client_id,
+        'security.protocol': 'SASL_SSL',
+        'sasl.mechanism': 'PLAIN',
+        'sasl.username': 'username',
+        'sasl.password': 'pswd'
+    }
+
+    topic_name = 'test_topic'
+    
+    factory = KafkaSinkFactory(conf=kafka_conf)
+    sink = factory.create(topic_name, key_function, value_function)
 
     datagen = create_example_data_online_generator(sink)
 

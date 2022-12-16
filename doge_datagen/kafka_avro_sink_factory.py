@@ -9,19 +9,23 @@ from doge_datagen import Subject, Transition, KafkaSinkFactory, KafkaSink
 class KafkaAvroSinkFactory(object):
 
     def __init__(self,
-                 bootstrap_servers: Iterable[str],
-                 schema_registry_url: str,
-                 client_id: str,
+                 bootstrap_servers: Iterable[str]=None,
+                 schema_registry_url: str=None,
+                 client_id: str=None,
+                 conf:dict=None,
                  buffer_size=100000):
         """
         :param bootstrap_servers: list of bootstrap servers
         :type bootstrap_servers: Iterable[str]
         :param schema_registry_url: schema registry url for example http://localhost:8081
         :type schema_registry_url: str
+        :pram conf : dictionary with addtional configuration parameters
+        :type conf: dictionary
         :param client_id: sink client id
         :type client_id: str
-        """
-        self.factory = KafkaSinkFactory(bootstrap_servers, client_id, buffer_size)
+        """  
+
+        self.factory = KafkaSinkFactory(bootstrap_servers, client_id, conf, buffer_size)
         schema_registry_conf = {'url': schema_registry_url}
         self.schema_registry_client = SchemaRegistryClient(schema_registry_conf)
 

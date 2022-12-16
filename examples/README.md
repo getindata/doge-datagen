@@ -1,4 +1,4 @@
-# Examples
+# Examples to run doge-datagen on k8s
 
 Below examples assumes that you have minikube cluster running with helmfile applied from 
 https://gitlab.com/getindata/streaming-labs/k8s-workloads
@@ -69,3 +69,37 @@ kafka-topics.sh --bootstrap-server localhost:9092 --create --topic clickstream -
 ```
 
 2. Run doge_demo.py
+
+
+# Examples to run doge-datagen on docker
+
+Requirements
+* docker installed 
+* docker compose installed
+
+In terminal cd to examples/docker
+
+Start technology stack
+
+```shell
+make start_techstack
+```
+
+Update ports in example files accordingly:
+* kafka 29092
+
+Create topic:
+* from terminal
+
+```shell
+make create_topic topicname=test_topic
+```
+
+* from akhq UI. In web browser open http://localhost:28080 and create and investigate topics
+
+To view database tables Dbeaver (https://dbeaver.io/) can be used
+
+
+
+
+
